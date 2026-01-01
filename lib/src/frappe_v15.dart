@@ -1353,7 +1353,7 @@ class FrappeV15 implements FrappeApi {
       throw Exception(handleDioError(e));
     } catch (e) {
       throw Exception(
-        '''An error occurred while checking document existence: $e''',
+        'An error occurred while checking document existence: $e',
       );
     }
   }
@@ -1526,6 +1526,7 @@ class FrappeV15 implements FrappeApi {
         ),
       );
 
+      // REST DELETE can return 200 OK, 202 Accepted, or 204 No Content
       if (response.statusCode == HttpStatus.ok ||
           response.statusCode == HttpStatus.accepted ||
           response.statusCode == HttpStatus.noContent) {
