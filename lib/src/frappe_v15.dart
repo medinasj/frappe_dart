@@ -232,38 +232,37 @@ class FrappeV15 implements FrappeApi {
   ) async {
     final url =
         '$_baseUrl/api/method/frappe.desk.doctype.number_card.number_card.get_percentage_difference';
-    try {
-      final numberCardDoc = await getdoc('Number Card', name);
+    return _executeRequest(
+      () async {
+        final numberCardDoc = await getdoc('Number Card', name);
 
-      final response = await _dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Cookie': _cookie ?? '',
+        final response = await _dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Cookie': _cookie ?? '',
+            },
+          ),
+          data: {
+            'doc': numberCardDoc.docs?[0].toJson(),
+            'filters': numberCardDoc.docs?[0].dynamicFiltersJson ?? '',
+            'result': result,
           },
-        ),
-        data: {
-          'doc': numberCardDoc.docs?[0].toJson(),
-          'filters': numberCardDoc.docs?[0].dynamicFiltersJson ?? '',
-          'result': result,
-        },
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return NumberCardPercentageDifferenceResponse.fromMap(response.data!);
-      } else {
-        throw Exception(
-          '''Failed to get desk number card. Response Status: ${response.statusCode}''',
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception(
-        '''An unknown error occurred while retrieving number card: $e''',
-      );
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return NumberCardPercentageDifferenceResponse.fromMap(
+            response.data!,
+          );
+        } else {
+          throw Exception(
+            '''Failed to get desk number card. Response Status: ${response.statusCode}''',
+          );
+        }
+      },
+      'An unknown error occurred while retrieving number card',
+    );
   }
 
   @override
@@ -272,34 +271,31 @@ class FrappeV15 implements FrappeApi {
   ) async {
     final url =
         '$_baseUrl/api/method/frappe.desk.form.load.getdoctype?doctype=$doctype&with_parent=1';
-    try {
-      final response = await _dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Cookie': _cookie ?? '',
+    return _executeRequest(
+      () async {
+        final response = await _dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Cookie': _cookie ?? '',
+            },
+          ),
+          data: {
+            'doctype': doctype,
           },
-        ),
-        data: {
-          'doctype': doctype,
-        },
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return GetDoctypeResponse.fromMap(response.data!);
-      } else {
-        throw Exception(
-          'Failed to get doc. Response Status: ${response.statusCode}',
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception(
-        '''An unknown error occurred while retrieving doc: $e''',
-      );
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return GetDoctypeResponse.fromMap(response.data!);
+        } else {
+          throw Exception(
+            'Failed to get doc. Response Status: ${response.statusCode}',
+          );
+        }
+      },
+      'An unknown error occurred while retrieving doc',
+    );
   }
 
   @override
@@ -391,32 +387,29 @@ class FrappeV15 implements FrappeApi {
   Future<GetCountResponse> getCount(GetCountRequest getCountRequest) async {
     final url =
         '$_baseUrl/api/method/frappe.client.get_count?doctype=${getCountRequest.doctype}';
-    try {
-      final response = await _dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Cookie': _cookie ?? '',
-          },
-        ),
-        data: getCountRequest.toMap(),
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return GetCountResponse.fromMap(response.data!);
-      } else {
-        throw Exception(
-          'Failed to get doc. Response Status: ${response.statusCode}',
+    return _executeRequest(
+      () async {
+        final response = await _dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Cookie': _cookie ?? '',
+            },
+          ),
+          data: getCountRequest.toMap(),
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception(
-        '''An unknown error occurred while retrieving doc: $e''',
-      );
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return GetCountResponse.fromMap(response.data!);
+        } else {
+          throw Exception(
+            'Failed to get doc. Response Status: ${response.statusCode}',
+          );
+        }
+      },
+      'An unknown error occurred while retrieving doc',
+    );
   }
 
   @override
@@ -428,36 +421,35 @@ class FrappeV15 implements FrappeApi {
   }) async {
     final url = '$_baseUrl/api/method/frappe.desk.form.save.savedocs';
 
-    try {
-      final response = await dio.post<Map<String, dynamic>>(
-        url,
-        data: {
-          'doc': toJson(),
-          'action': action,
-        },
-        options: Options(
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Cookie': _cookie ?? '',
+    return _executeRequest(
+      () async {
+        final response = await dio.post<Map<String, dynamic>>(
+          url,
+          data: {
+            'doc': toJson(),
+            'action': action,
           },
-        ),
-      );
+          options: Options(
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Cookie': _cookie ?? '',
+            },
+          ),
+        );
 
-      if (response.statusCode == HttpStatus.ok) {
-        return SavedocsReponse.fromMap<T>(
-          response.data!,
-          fromMap,
-        );
-      } else {
-        throw Exception(
-          'Failed to save doc. Status: ${response.statusCode}',
-        );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception('An unknown error occurred while saving doc: $e');
-    }
+        if (response.statusCode == HttpStatus.ok) {
+          return SavedocsReponse.fromMap<T>(
+            response.data!,
+            fromMap,
+          );
+        } else {
+          throw Exception(
+            'Failed to save doc. Status: ${response.statusCode}',
+          );
+        }
+      },
+      'An unknown error occurred while saving doc',
+    );
   }
 
   @override
@@ -466,31 +458,28 @@ class FrappeV15 implements FrappeApi {
   ) async {
     final url = '$_baseUrl/api/method/frappe.desk.search.search_link';
 
-    try {
-      final response = await _dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Cookie': _cookie ?? '',
-          },
-        ),
-        data: searchLinkRequest.toMap(),
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return SearchLinkResponse.fromMap(response.data!);
-      } else {
-        throw Exception(
-          'Failed to search link. Response Status: ${response.statusCode}',
+    return _executeRequest(
+      () async {
+        final response = await _dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Cookie': _cookie ?? '',
+            },
+          ),
+          data: searchLinkRequest.toMap(),
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception(
-        '''An unknown error occurred while searching link: $e''',
-      );
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return SearchLinkResponse.fromMap(response.data!);
+        } else {
+          throw Exception(
+            'Failed to search link. Response Status: ${response.statusCode}',
+          );
+        }
+      },
+      'An unknown error occurred while searching link',
+    );
   }
 
   @override
@@ -499,32 +488,29 @@ class FrappeV15 implements FrappeApi {
   ) async {
     final url = '$_baseUrl/api/method/frappe.client.validate_link';
 
-    try {
-      final response = await _dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Cookie': _cookie ?? '',
-          },
-        ),
-        data: validateLinkRequest.toMap(),
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return response.data!;
-      } else {
-        throw Exception(
-          'Failed to search link. Response Status: ${response.statusCode}',
+    return _executeRequest(
+      () async {
+        final response = await _dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Cookie': _cookie ?? '',
+            },
+          ),
+          data: validateLinkRequest.toMap(),
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception(
-        '''An unknown error occurred while searching for link: $e''',
-      );
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return response.data!;
+        } else {
+          throw Exception(
+            'Failed to search link. Response Status: ${response.statusCode}',
+          );
+        }
+      },
+      'An unknown error occurred while searching for link',
+    );
   }
 
   @override
@@ -532,60 +518,54 @@ class FrappeV15 implements FrappeApi {
     final url =
         '$_baseUrl/api/method/frappe.core.doctype.system_settings.system_settings.load';
 
-    try {
-      final response = await _dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Cookie': _cookie ?? '',
-          },
-        ),
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return SystemSettingsResponse.fromMap(response.data!);
-      } else {
-        throw Exception(
-          '''Failed to get system settings. Response Status: ${response.statusCode}''',
+    return _executeRequest(
+      () async {
+        final response = await _dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Cookie': _cookie ?? '',
+            },
+          ),
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception(
-        '''An unknown error occurred while retrieving system settings: $e''',
-      );
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return SystemSettingsResponse.fromMap(response.data!);
+        } else {
+          throw Exception(
+            '''Failed to get system settings. Response Status: ${response.statusCode}''',
+          );
+        }
+      },
+      'An unknown error occurred while retrieving system settings',
+    );
   }
 
   @override
   Future<GetVersionsResponse> getVersions() async {
     final url = '$_baseUrl/api/method/frappe.utils.change_log.get_versions';
 
-    try {
-      final response = await _dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Cookie': _cookie ?? '',
-          },
-        ),
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return GetVersionsResponse.fromMap(response.data!);
-      } else {
-        throw Exception(
-          'Failed to get versions. Response Status: ${response.statusCode}',
+    return _executeRequest(
+      () async {
+        final response = await _dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Cookie': _cookie ?? '',
+            },
+          ),
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception(
-        '''An unknown error occurred while retrieving versions: $e''',
-      );
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return GetVersionsResponse.fromMap(response.data!);
+        } else {
+          throw Exception(
+            'Failed to get versions. Response Status: ${response.statusCode}',
+          );
+        }
+      },
+      'An unknown error occurred while retrieving versions',
+    );
   }
 
   @override
