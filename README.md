@@ -24,6 +24,8 @@ dependencies:
 
 Once installed, you can use the wrapper to interact with the Frappe API. Here's an example of how to perform a basic request:
 
+### Using Frappe V15
+
 ```dart
 import 'package:frappe_dart/frappe_dart.dart';
 
@@ -60,14 +62,75 @@ void main() async {
 }
 ```
 
+### Using Frappe V14
+
+```dart
+import 'package:frappe_dart/frappe_dart.dart';
+
+void main() async {
+  final frappeClient = FrappeV14(
+    baseUrl: 'https://your-frappe-url.com',
+  );
+
+  try {
+    final authResponse = await frappeClient.login(
+      LoginRequest(
+        usr: 'your-username',
+        pwd: 'your-password',
+      ),
+    );
+
+    frappeClient.cookie = authResponse.cookie;
+
+    final sidebarItems = await frappeClient.getDeskSideBarItems();
+
+    final page = sidebarItems.message!.pages!
+        .firstWhere((element) => element.name == 'Users');
+
+    final deskPage = await frappeClient.getDesktopPage(
+      DesktopPageRequest(
+        name: page.name,
+      ),
+    );
+
+    print(deskPage.toJson());
+  } catch (error) {
+    print('Error: $error');
+  }
+}
+```
+
 ## How to extend
 
 You can extend the functionality of frappe_dart to support additional custom API endpoints using Dart's extension methods.
+
+### Extending FrappeV15
 
 ```dart
 import 'package:http/http.dart' as http;
 
 extension FrappeV15Extensions on FrappeV15 {
+  Future<Map<String, dynamic>> newApiEndPoint() async {
+    final url = '$baseUrl/api/method/new_api_endpoint';
+
+    final response = await dio.get<Map<String, dynamic>>(
+      url,
+      headers: {
+        if (cookie != null) 'Cookie': cookie,
+      },
+    );
+
+    return response.data!;
+  }
+}
+```
+
+### Extending FrappeV14
+
+```dart
+import 'package:http/http.dart' as http;
+
+extension FrappeV14Extensions on FrappeV14 {
   Future<Map<String, dynamic>> newApiEndPoint() async {
     final url = '$baseUrl/api/method/new_api_endpoint';
 
