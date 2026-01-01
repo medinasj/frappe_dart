@@ -60,6 +60,186 @@ void main() async {
 }
 ```
 
+## Resource API
+
+The package now includes improved Resource API methods with better error handling using `ApiResult<T>`:
+
+### Get a List of Resources
+
+```dart
+final result = await frappeClient.getResourceList(
+  'User',
+  options: QueryOptions(
+    filters: '[["enabled", "=", 1]]',
+    fields: ['name', 'full_name', 'email'],
+    orderBy: 'creation desc',
+    limitPageLength: 20,
+    limitStart: 0,
+  ),
+);
+
+if (result.isSuccess) {
+  final users = result.data!['data'] as List;
+  print('Found ${users.length} users');
+} else {
+  print('Error: ${result.error!.message}');
+}
+```
+
+### Get a Single Resource
+
+```dart
+final result = await frappeClient.getResource('User', 'user@example.com');
+
+if (result.isSuccess) {
+  final user = result.data!['data'];
+  print('Full name: ${user['full_name']}');
+}
+```
+
+### Create a Resource
+
+```dart
+final result = await frappeClient.createResource('ToDo', {
+  'description': 'Complete the task',
+  'status': 'Open',
+});
+
+if (result.isSuccess) {
+  final newTodo = result.data!['data'];
+  print('Created: ${newTodo['name']}');
+}
+```
+
+### Update a Resource
+
+```dart
+final result = await frappeClient.updateResource(
+  'ToDo',
+  'TODO-00001',
+  {'status': 'Closed'},
+);
+
+if (result.isSuccess) {
+  print('Updated successfully');
+}
+```
+
+### Delete a Resource
+
+```dart
+final result = await frappeClient.deleteResource('ToDo', 'TODO-00001');
+
+if (result.isSuccess) {
+  print('Deleted successfully');
+}
+```
+
+## Query Options
+
+Use `QueryOptions` to filter and sort resource queries:
+
+```dart
+final options = QueryOptions(
+  // Filter conditions as JSON array string
+  filters: '[["status", "=", "Open"], ["creation", ">=", "2025-01-01"]]',
+  
+  // Specific fields to return
+  fields: ['name', 'customer', 'status'],
+  
+  // Sort order
+  orderBy: 'creation desc',
+  
+  // Pagination
+  limitPageLength: 20,
+  limitStart: 0,
+);
+```
+
+### Available Filter Operators
+
+- `=`, `!=` - Equality
+- `>`, `<`, `>=`, `<=` - Comparison
+- `like`, `not like` - Pattern matching
+- `in`, `not in` - List membership
+- `is`, `is not` - Null checks
+
+## Error Handling with ApiResult
+
+The new Resource API methods return `ApiResult<T>` for clean error handling:
+
+```dart
+final result = await frappeClient.getResource('User', 'user@example.com');
+
+if (result.isSuccess) {
+  // Access data
+  final data = result.data!;
+  print(data);
+} else {
+  // Handle error
+  final error = result.error!;
+  print('Error: ${error.message}');
+  print('Status Code: ${error.statusCode}');
+  print('Additional Data: ${error.data}');
+}
+```
+
+### Result Mapping
+
+Transform API responses easily:
+
+```dart
+final result = await frappeClient.getResource('User', 'user@example.com');
+
+final mappedResult = result.map((data) {
+  final userData = data['data'] as Map<String, dynamic>;
+  return User.fromJson(userData);
+});
+
+if (mappedResult.isSuccess) {
+  final user = mappedResult.data!;
+  print(user.fullName);
+}
+```
+
+## Custom Method Calls
+
+Call custom Frappe server-side methods:
+
+```dart
+// POST request
+final result = await frappeClient.callFrappeMethod(
+  'myapp.api.update_status',
+  data: {
+    'docname': 'TODO-00001',
+    'status': 'Completed',
+  },
+);
+
+// GET request
+final result = await frappeClient.callFrappeMethodGet(
+  'myapp.api.get_statistics',
+  queryParams: {'date': '2025-12-14'},
+);
+```
+
+## Setting Field Values
+
+Set individual field values on documents:
+
+```dart
+final result = await frappeClient.setFieldValue(
+  'User',
+  'user@example.com',
+  'bio',
+  'Software developer',
+);
+
+if (result.isSuccess) {
+  print('Field updated successfully');
+}
+```
+
 ## How to extend
 
 You can extend the functionality of frappe_dart to support additional custom API endpoints using Dart's extension methods.

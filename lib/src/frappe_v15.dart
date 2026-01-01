@@ -1169,4 +1169,488 @@ class FrappeV15 implements FrappeApi {
       throw Exception('An error occurred while running doc method: $e');
     }
   }
+
+  // ==================== Resource API Methods ====================
+
+  /// Gets a list of resources from a DocType using the Resource API.
+  ///
+  /// This method uses Frappe's REST Resource API endpoint which provides
+  /// a cleaner interface for CRUD operations.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await client.getResourceList(
+  ///   'User',
+  ///   options: QueryOptions(
+  ///     filters: '[["enabled", "=", 1]]',
+  ///     fields: ['name', 'full_name', 'email'],
+  ///     orderBy: 'creation desc',
+  ///     limitPageLength: 20,
+  ///   ),
+  /// );
+  /// ```
+  Future<ApiResult<Map<String, dynamic>>> getResourceList(
+    String docType, {
+    QueryOptions? options,
+  }) async {
+    try {
+      final uri = Uri.parse('$_baseUrl/api/resource/$docType').replace(
+        queryParameters: options?.toQueryParams(),
+      );
+
+      final response = await _dio.get<Map<String, dynamic>>(
+        uri.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            if (_cookie != null) 'Cookie': _cookie,
+          },
+        ),
+      );
+
+      if (response.statusCode == HttpStatus.ok) {
+        return ApiResult.success(response.data!);
+      } else {
+        final errorMessage = response.data?['message'] as String? ??
+            'Failed to get resource list';
+        return ApiResult.failure(
+          FrappeException(
+            message: errorMessage,
+            statusCode: response.statusCode,
+            data: response.data,
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      return ApiResult.failure(
+        FrappeException(
+          message: handleDioError(e),
+          statusCode: e.response?.statusCode,
+          data: e.response?.data,
+        ),
+      );
+    } catch (e) {
+      return ApiResult.failure(
+        FrappeException(message: 'Failed to get resource list: $e'),
+      );
+    }
+  }
+
+  /// Gets a single resource by name using the Resource API.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await client.getResource('User', 'user@example.com');
+  /// if (result.isSuccess) {
+  ///   final userData = result.data!['data'];
+  ///   print('Full name: ${userData['full_name']}');
+  /// }
+  /// ```
+  Future<ApiResult<Map<String, dynamic>>> getResource(
+    String docType,
+    String name,
+  ) async {
+    try {
+      final uri = Uri.parse('$_baseUrl/api/resource/$docType/$name');
+
+      final response = await _dio.get<Map<String, dynamic>>(
+        uri.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            if (_cookie != null) 'Cookie': _cookie,
+          },
+        ),
+      );
+
+      if (response.statusCode == HttpStatus.ok) {
+        return ApiResult.success(response.data!);
+      } else {
+        final errorMessage =
+            response.data?['message'] as String? ?? 'Failed to get resource';
+        return ApiResult.failure(
+          FrappeException(
+            message: errorMessage,
+            statusCode: response.statusCode,
+            data: response.data,
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      return ApiResult.failure(
+        FrappeException(
+          message: handleDioError(e),
+          statusCode: e.response?.statusCode,
+          data: e.response?.data,
+        ),
+      );
+    } catch (e) {
+      return ApiResult.failure(
+        FrappeException(message: 'Failed to get resource: $e'),
+      );
+    }
+  }
+
+  /// Creates a new resource using the Resource API.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await client.createResource('ToDo', {
+  ///   'description': 'Complete the task',
+  ///   'status': 'Open',
+  /// });
+  /// if (result.isSuccess) {
+  ///   print('Created: ${result.data!['data']['name']}');
+  /// }
+  /// ```
+  Future<ApiResult<Map<String, dynamic>>> createResource(
+    String docType,
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      final uri = Uri.parse('$_baseUrl/api/resource/$docType');
+
+      final response = await _dio.post<Map<String, dynamic>>(
+        uri.toString(),
+        data: data,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            if (_cookie != null) 'Cookie': _cookie,
+          },
+        ),
+      );
+
+      if (response.statusCode == HttpStatus.ok ||
+          response.statusCode == HttpStatus.created) {
+        return ApiResult.success(response.data!);
+      } else {
+        final errorMessage =
+            response.data?['message'] as String? ?? 'Failed to create resource';
+        return ApiResult.failure(
+          FrappeException(
+            message: errorMessage,
+            statusCode: response.statusCode,
+            data: response.data,
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      return ApiResult.failure(
+        FrappeException(
+          message: handleDioError(e),
+          statusCode: e.response?.statusCode,
+          data: e.response?.data,
+        ),
+      );
+    } catch (e) {
+      return ApiResult.failure(
+        FrappeException(message: 'Failed to create resource: $e'),
+      );
+    }
+  }
+
+  /// Updates an existing resource using the Resource API.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await client.updateResource(
+  ///   'ToDo',
+  ///   'TODO-00001',
+  ///   {'status': 'Closed'},
+  /// );
+  /// ```
+  Future<ApiResult<Map<String, dynamic>>> updateResource(
+    String docType,
+    String name,
+    Map<String, dynamic> data,
+  ) async {
+    try {
+      final uri = Uri.parse('$_baseUrl/api/resource/$docType/$name');
+
+      final response = await _dio.put<Map<String, dynamic>>(
+        uri.toString(),
+        data: data,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            if (_cookie != null) 'Cookie': _cookie,
+          },
+        ),
+      );
+
+      if (response.statusCode == HttpStatus.ok) {
+        return ApiResult.success(response.data!);
+      } else {
+        final errorMessage =
+            response.data?['message'] as String? ?? 'Failed to update resource';
+        return ApiResult.failure(
+          FrappeException(
+            message: errorMessage,
+            statusCode: response.statusCode,
+            data: response.data,
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      return ApiResult.failure(
+        FrappeException(
+          message: handleDioError(e),
+          statusCode: e.response?.statusCode,
+          data: e.response?.data,
+        ),
+      );
+    } catch (e) {
+      return ApiResult.failure(
+        FrappeException(message: 'Failed to update resource: $e'),
+      );
+    }
+  }
+
+  /// Deletes a resource using the Resource API.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await client.deleteResource('ToDo', 'TODO-00001');
+  /// if (result.isSuccess) {
+  ///   print('Deleted successfully');
+  /// }
+  /// ```
+  Future<ApiResult<Map<String, dynamic>>> deleteResource(
+    String docType,
+    String name,
+  ) async {
+    try {
+      final uri = Uri.parse('$_baseUrl/api/resource/$docType/$name');
+
+      final response = await _dio.delete<Map<String, dynamic>>(
+        uri.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            if (_cookie != null) 'Cookie': _cookie,
+          },
+        ),
+      );
+
+      if (response.statusCode == HttpStatus.ok ||
+          response.statusCode == HttpStatus.accepted ||
+          response.statusCode == HttpStatus.noContent) {
+        return ApiResult.success(response.data ?? {'message': 'Deleted'});
+      } else {
+        final errorMessage =
+            response.data?['message'] as String? ?? 'Failed to delete resource';
+        return ApiResult.failure(
+          FrappeException(
+            message: errorMessage,
+            statusCode: response.statusCode,
+            data: response.data,
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      return ApiResult.failure(
+        FrappeException(
+          message: handleDioError(e),
+          statusCode: e.response?.statusCode,
+          data: e.response?.data,
+        ),
+      );
+    } catch (e) {
+      return ApiResult.failure(
+        FrappeException(message: 'Failed to delete resource: $e'),
+      );
+    }
+  }
+
+  /// Sets a field value on a document using frappe.client.set_value.
+  ///
+  /// This is a convenience method similar to flutter_next_base's setValue.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await client.setFieldValue(
+  ///   'User',
+  ///   'user@example.com',
+  ///   'bio',
+  ///   'Software developer',
+  /// );
+  /// ```
+  Future<ApiResult<Map<String, dynamic>>> setFieldValue(
+    String docType,
+    String name,
+    String fieldName,
+    dynamic value,
+  ) async {
+    try {
+      final url = '$_baseUrl/api/method/frappe.client.set_value';
+
+      final data = {
+        'doctype': docType,
+        'name': name,
+        'fieldname': fieldName,
+        'value': value,
+      };
+
+      final response = await _dio.post<Map<String, dynamic>>(
+        url,
+        data: data,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            if (_cookie != null) 'Cookie': _cookie,
+          },
+        ),
+      );
+
+      if (response.statusCode == HttpStatus.ok) {
+        return ApiResult.success(response.data!);
+      } else {
+        final errorMessage =
+            response.data?['message'] as String? ?? 'Failed to set value';
+        return ApiResult.failure(
+          FrappeException(
+            message: errorMessage,
+            statusCode: response.statusCode,
+            data: response.data,
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      return ApiResult.failure(
+        FrappeException(
+          message: handleDioError(e),
+          statusCode: e.response?.statusCode,
+          data: e.response?.data,
+        ),
+      );
+    } catch (e) {
+      return ApiResult.failure(
+        FrappeException(message: 'Failed to set value: $e'),
+      );
+    }
+  }
+
+  /// Calls a custom Frappe method.
+  ///
+  /// This provides a clean interface for calling custom server-side methods.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await client.callFrappeMethod(
+  ///   'myapp.api.custom_function',
+  ///   data: {'param1': 'value1'},
+  /// );
+  /// ```
+  Future<ApiResult<Map<String, dynamic>>> callFrappeMethod(
+    String methodPath, {
+    Map<String, dynamic>? data,
+    Map<String, String>? queryParams,
+  }) async {
+    try {
+      final uri = Uri.parse('$_baseUrl/api/method/$methodPath').replace(
+        queryParameters: queryParams,
+      );
+
+      final response = await _dio.post<Map<String, dynamic>>(
+        uri.toString(),
+        data: data,
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            if (_cookie != null) 'Cookie': _cookie,
+          },
+        ),
+      );
+
+      if (response.statusCode == HttpStatus.ok) {
+        return ApiResult.success(response.data!);
+      } else {
+        final errorMessage =
+            response.data?['message'] as String? ?? 'Failed to call method';
+        return ApiResult.failure(
+          FrappeException(
+            message: errorMessage,
+            statusCode: response.statusCode,
+            data: response.data,
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      return ApiResult.failure(
+        FrappeException(
+          message: handleDioError(e),
+          statusCode: e.response?.statusCode,
+          data: e.response?.data,
+        ),
+      );
+    } catch (e) {
+      return ApiResult.failure(
+        FrappeException(message: 'Failed to call method: $e'),
+      );
+    }
+  }
+
+  /// Calls a custom Frappe method with GET request.
+  ///
+  /// Example:
+  /// ```dart
+  /// final result = await client.callFrappeMethodGet(
+  ///   'myapp.api.get_data',
+  ///   queryParams: {'id': '123'},
+  /// );
+  /// ```
+  Future<ApiResult<Map<String, dynamic>>> callFrappeMethodGet(
+    String methodPath, {
+    Map<String, String>? queryParams,
+  }) async {
+    try {
+      final uri = Uri.parse('$_baseUrl/api/method/$methodPath').replace(
+        queryParameters: queryParams,
+      );
+
+      final response = await _dio.get<Map<String, dynamic>>(
+        uri.toString(),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            if (_cookie != null) 'Cookie': _cookie,
+          },
+        ),
+      );
+
+      if (response.statusCode == HttpStatus.ok) {
+        return ApiResult.success(response.data!);
+      } else {
+        final errorMessage =
+            response.data?['message'] as String? ?? 'Failed to call method';
+        return ApiResult.failure(
+          FrappeException(
+            message: errorMessage,
+            statusCode: response.statusCode,
+            data: response.data,
+          ),
+        );
+      }
+    } on DioException catch (e) {
+      return ApiResult.failure(
+        FrappeException(
+          message: handleDioError(e),
+          statusCode: e.response?.statusCode,
+          data: e.response?.data,
+        ),
+      );
+    } catch (e) {
+      return ApiResult.failure(
+        FrappeException(message: 'Failed to call method: $e'),
+      );
+    }
+  }
 }
