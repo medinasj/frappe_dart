@@ -12,7 +12,7 @@ class SavedocsRequest {
     return SavedocsRequest(
       doc: json.decode(data['doc'] as String) as Map<String, dynamic>,
       action: Action.values.firstWhere(
-        (e) => e.toString().split('.').last == data['action'],
+        (e) => e.name == data['action'],
       ),
     );
   }
@@ -28,7 +28,7 @@ class SavedocsRequest {
 
   Map<String, dynamic> toMap() => {
         'doc': json.encode(doc),
-        'action': action.toString().split('.').last,
+        'action': action.name,
       };
 
   /// `dart:convert`
