@@ -129,7 +129,7 @@ class FrappeServerException extends FrappeException {
   });
 
   @override
-  String toString() => 
+  String toString() =>
       'FrappeServerException: $message (Status: ${statusCode ?? 500})';
 }
 
