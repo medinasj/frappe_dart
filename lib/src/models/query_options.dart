@@ -1,27 +1,58 @@
+import 'dart:convert';
+
+import 'package:frappe_dart/src/models/filter.dart';
+
 /// Options for filtering and sorting resource queries.
 ///
 /// This provides a clean way to build query parameters for resource list
 /// endpoints. Supports filtering, field selection, sorting, and pagination.
 ///
-/// Example:
+/// Example with Filter objects:
 /// ```dart
 /// final options = QueryOptions(
-///   filters: '[["status", "=", "Open"]]',
+///   filters: [
+///     Filter.equal('status', 'Open'),
+///     Filter.greaterThan('amount', 1000),
+///   ],
 ///   fields: ['name', 'customer', 'status'],
 ///   orderBy: 'creation desc',
 ///   limitPageLength: 20,
 ///   limitStart: 0,
 /// );
 /// ```
+///
+/// Example with JSON string:
+/// ```dart
+/// final options = QueryOptions(
+///   filtersJson: '[["status", "=", "Open"]]',
+///   fields: ['name', 'customer', 'status'],
+/// );
+/// ```
 class QueryOptions {
   /// Creates a new [QueryOptions] instance.
   const QueryOptions({
     this.filters,
+    this.filtersJson,
     this.fields,
     this.orderBy,
     this.limitPageLength,
     this.limitStart,
-  });
+  }) : assert(
+          filters == null || filtersJson == null,
+          'Cannot provide both filters and filtersJson',
+        );
+
+  /// Filter conditions as a list of [Filter] objects.
+  ///
+  /// Examples:
+  /// ```dart
+  /// filters: [
+  ///   Filter.equal('status', 'Open'),
+  ///   Filter.greaterThan('amount', 1000),
+  ///   Filter.like('customer', '%Corp%'),
+  /// ]
+  /// ```
+  final List<Filter>? filters;
 
   /// Filter conditions as a JSON array string.
   ///
@@ -34,7 +65,7 @@ class QueryOptions {
   ///
   /// Available operators: `=`, `!=`, `>`, `<`, `>=`, `<=`, `like`,
   /// `not like`, `in`, `not in`, `is`, `is not`
-  final String? filters;
+  final String? filtersJson;
 
   /// Fields to include in the response.
   ///
@@ -65,9 +96,14 @@ class QueryOptions {
   Map<String, String> toQueryParams() {
     final params = <String, String>{};
 
-    if (filters != null) {
-      params['filters'] = filters!;
+    // Handle filters
+    if (filters != null && filters!.isNotEmpty) {
+      final filtersList = filters!.map((f) => f.toJson()).toList();
+      params['filters'] = jsonEncode(filtersList);
+    } else if (filtersJson != null) {
+      params['filters'] = filtersJson!;
     }
+
     if (fields != null && fields!.isNotEmpty) {
       params['fields'] = '["${fields!.join('","')}"]';
     }

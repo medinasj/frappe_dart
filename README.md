@@ -17,7 +17,7 @@ To get started with the `frappe_dart` package, add it to your project's `pubspec
 
 ```yaml
 dependencies:
-  frappe_dart: ^0.0.7
+  frappe_dart: ^0.0.8
 ```
 
 ## Usage
@@ -66,11 +66,16 @@ The package now includes improved Resource API methods with better error handlin
 
 ### Get a List of Resources
 
+Using type-safe Filter objects:
+
 ```dart
 final result = await frappeClient.getResourceList(
   'User',
   options: QueryOptions(
-    filters: '[["enabled", "=", 1]]',
+    filters: [
+      Filter.equal('enabled', 1),
+      Filter.greaterThan('creation', '2025-01-01'),
+    ],
     fields: ['name', 'full_name', 'email'],
     orderBy: 'creation desc',
     limitPageLength: 20,
@@ -84,6 +89,20 @@ if (result.isSuccess) {
 } else {
   print('Error: ${result.error!.message}');
 }
+```
+
+Or using JSON string filters:
+
+```dart
+final result = await frappeClient.getResourceList(
+  'User',
+  options: QueryOptions(
+    filtersJson: '[["enabled", "=", 1]]',
+    fields: ['name', 'full_name', 'email'],
+    orderBy: 'creation desc',
+    limitPageLength: 20,
+  ),
+);
 ```
 
 ### Get a Single Resource
@@ -135,14 +154,49 @@ if (result.isSuccess) {
 }
 ```
 
-## Query Options
+## Type-Safe Filters
 
-Use `QueryOptions` to filter and sort resource queries:
+Use the `Filter` class for type-safe, readable filter building:
+
+```dart
+// Using Filter objects (recommended)
+final options = QueryOptions(
+  filters: [
+    Filter.equal('status', 'Open'),
+    Filter.greaterThan('amount', 1000),
+    Filter.like('customer_name', '%Corp%'),
+    Filter.isIn('type', ['Sales', 'Purchase']),
+  ],
+  fields: ['name', 'customer', 'status'],
+  orderBy: 'creation desc',
+  limitPageLength: 20,
+  limitStart: 0,
+);
+```
+
+### Filter Constructors
+
+- `Filter.equal(field, value)` - Equal to (=)
+- `Filter.notEqual(field, value)` - Not equal to (!=)
+- `Filter.greaterThan(field, value)` - Greater than (>)
+- `Filter.greaterThanOrEqual(field, value)` - Greater than or equal (>=)
+- `Filter.lessThan(field, value)` - Less than (<)
+- `Filter.lessThanOrEqual(field, value)` - Less than or equal (<=)
+- `Filter.like(field, value)` - Pattern matching
+- `Filter.notLike(field, value)` - Negative pattern matching
+- `Filter.isIn(field, value)` - In list
+- `Filter.notIn(field, value)` - Not in list
+- `Filter.isNull(field)` - Is null
+- `Filter.isNotNull(field)` - Is not null
+
+### JSON String Filters (alternative)
+
+You can also use JSON string filters if needed:
 
 ```dart
 final options = QueryOptions(
   // Filter conditions as JSON array string
-  filters: '[["status", "=", "Open"], ["creation", ">=", "2025-01-01"]]',
+  filtersJson: '[["status", "=", "Open"], ["creation", ">=", "2025-01-01"]]',
   
   // Specific fields to return
   fields: ['name', 'customer', 'status'],
@@ -156,13 +210,51 @@ final options = QueryOptions(
 );
 ```
 
-### Available Filter Operators
+## Type-Safe Document Models
 
-- `=`, `!=` - Equality
-- `>`, `<`, `>=`, `<=` - Comparison
-- `like`, `not like` - Pattern matching
-- `in`, `not in` - List membership
-- `is`, `is not` - Null checks
+Extend `FrappeDoc` to create type-safe document models:
+
+```dart
+class User extends FrappeDoc {
+  const User({
+    required super.name,
+    required super.owner,
+    required super.creation,
+    required super.modified,
+    required super.modifiedBy,
+    required this.email,
+    required this.fullName,
+    required this.enabled,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      name: json['name'] as String,
+      owner: json['owner'] as String,
+      creation: DateTime.parse(json['creation'] as String),
+      modified: DateTime.parse(json['modified'] as String),
+      modifiedBy: json['modified_by'] as String,
+      email: json['email'] as String,
+      fullName: json['full_name'] as String,
+      enabled: json['enabled'] == 1,
+    );
+  }
+
+  final String email;
+  final String fullName;
+  final bool enabled;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'owner': owner,
+      'email': email,
+      'full_name': fullName,
+      'enabled': enabled ? 1 : 0,
+    };
+  }
+}
+```
 
 ## Error Handling with ApiResult
 
@@ -176,13 +268,33 @@ if (result.isSuccess) {
   final data = result.data!;
   print(data);
 } else {
-  // Handle error
+  // Handle error - specific exception types
   final error = result.error!;
-  print('Error: ${error.message}');
+  
+  if (error is FrappeNotFoundException) {
+    print('User not found');
+  } else if (error is FrappeUnauthorizedException) {
+    print('Please log in');
+  } else if (error is FrappeForbiddenException) {
+    print('Access denied');
+  } else if (error is FrappeServerException) {
+    print('Server error occurred');
+  } else {
+    print('Error: ${error.message}');
+  }
+  
   print('Status Code: ${error.statusCode}');
   print('Additional Data: ${error.data}');
 }
 ```
+
+### Specific Exception Types
+
+- `FrappeNotFoundException` - Resource not found (404)
+- `FrappeUnauthorizedException` - Authentication required (401)
+- `FrappeForbiddenException` - Access forbidden (403)
+- `FrappeServerException` - Server errors (500+)
+- `FrappeHttpException` - Other HTTP errors
 
 ### Result Mapping
 

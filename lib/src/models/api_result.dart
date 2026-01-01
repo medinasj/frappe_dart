@@ -58,7 +58,7 @@ class ApiResult<T> {
         return ApiResult.success(mapper(data!));
       } catch (e) {
         return ApiResult.failure(
-          FrappeException(message: 'Mapping error: $e'),
+          FrappeException.fromStatusCode(message: 'Mapping error: $e'),
         );
       }
     }

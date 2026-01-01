@@ -13,7 +13,10 @@ void main() {
     });
 
     test('failure creates an error result', () {
-      const exception = FrappeException(message: 'Test error');
+      const exception = FrappeHttpException(
+        message: 'Test error',
+        statusCode: 500,
+      );
       final result = ApiResult<String>.failure(exception);
 
       expect(result.isSuccess, isFalse);
@@ -31,7 +34,10 @@ void main() {
     });
 
     test('map preserves error result', () {
-      const exception = FrappeException(message: 'Test error');
+      const exception = FrappeHttpException(
+        message: 'Test error',
+        statusCode: 500,
+      );
       final result = ApiResult<int>.failure(exception);
       final mapped = result.map((value) => 'Number: $value');
 
@@ -51,37 +57,170 @@ void main() {
   });
 
   group('FrappeException', () {
-    test('creates exception with message only', () {
-      const exception = FrappeException(message: 'Test error');
+    test('FrappeNotFoundException has correct status code', () {
+      const exception = FrappeNotFoundException(message: 'Not found');
 
-      expect(exception.message, equals('Test error'));
-      expect(exception.statusCode, isNull);
-      expect(exception.data, isNull);
+      expect(exception.message, equals('Not found'));
+      expect(exception.statusCode, equals(404));
+      expect(exception.toString(), contains('FrappeNotFoundException'));
+      expect(exception.toString(), contains('404'));
     });
 
-    test('creates exception with all fields', () {
-      const exception = FrappeException(
-        message: 'Test error',
-        statusCode: 404,
-        data: {'error': 'Not found'},
+    test('FrappeUnauthorizedException has correct status code', () {
+      const exception = FrappeUnauthorizedException(message: 'Unauthorized');
+
+      expect(exception.message, equals('Unauthorized'));
+      expect(exception.statusCode, equals(401));
+      expect(exception.toString(), contains('FrappeUnauthorizedException'));
+    });
+
+    test('FrappeForbiddenException has correct status code', () {
+      const exception = FrappeForbiddenException(message: 'Forbidden');
+
+      expect(exception.message, equals('Forbidden'));
+      expect(exception.statusCode, equals(403));
+      expect(exception.toString(), contains('FrappeForbiddenException'));
+    });
+
+    test('FrappeServerException has correct status code', () {
+      const exception = FrappeServerException(message: 'Server error');
+
+      expect(exception.message, equals('Server error'));
+      expect(exception.statusCode, equals(500));
+      expect(exception.toString(), contains('FrappeServerException'));
+    });
+
+    test('FrappeHttpException with custom status code', () {
+      const exception = FrappeHttpException(
+        message: 'Bad request',
+        statusCode: 400,
       );
 
-      expect(exception.message, equals('Test error'));
-      expect(exception.statusCode, equals(404));
-      expect(exception.data, equals({'error': 'Not found'}));
+      expect(exception.message, equals('Bad request'));
+      expect(exception.statusCode, equals(400));
     });
 
-    test('toString includes all available information', () {
-      const exception = FrappeException(
+    test('exception with additional data', () {
+      const exception = FrappeHttpException(
         message: 'Test error',
         statusCode: 500,
         data: {'detail': 'Server error'},
       );
 
+      expect(exception.data, equals({'detail': 'Server error'}));
       final string = exception.toString();
-      expect(string, contains('FrappeException: Test error'));
-      expect(string, contains('Status: 500'));
+      expect(string, contains('Test error'));
       expect(string, contains('detail'));
+    });
+  });
+
+  group('Filter', () {
+    test('equal filter creates correct JSON', () {
+      const filter = Filter.equal('status', 'Open');
+
+      expect(filter.field, equals('status'));
+      expect(filter.operator, equals('='));
+      expect(filter.value, equals('Open'));
+      expect(filter.toJson(), equals(['status', '=', 'Open']));
+    });
+
+    test('notEqual filter creates correct JSON', () {
+      const filter = Filter.notEqual('status', 'Closed');
+
+      expect(filter.operator, equals('!='));
+      expect(filter.toJson(), equals(['status', '!=', 'Closed']));
+    });
+
+    test('greaterThan filter creates correct JSON', () {
+      const filter = Filter.greaterThan('amount', 1000);
+
+      expect(filter.operator, equals('>'));
+      expect(filter.toJson(), equals(['amount', '>', 1000]));
+    });
+
+    test('greaterThanOrEqual filter creates correct JSON', () {
+      const filter = Filter.greaterThanOrEqual('amount', 1000);
+
+      expect(filter.operator, equals('>='));
+      expect(filter.toJson(), equals(['amount', '>=', 1000]));
+    });
+
+    test('lessThan filter creates correct JSON', () {
+      const filter = Filter.lessThan('amount', 100);
+
+      expect(filter.operator, equals('<'));
+      expect(filter.toJson(), equals(['amount', '<', 100]));
+    });
+
+    test('lessThanOrEqual filter creates correct JSON', () {
+      const filter = Filter.lessThanOrEqual('amount', 100);
+
+      expect(filter.operator, equals('<='));
+      expect(filter.toJson(), equals(['amount', '<=', 100]));
+    });
+
+    test('like filter creates correct JSON', () {
+      const filter = Filter.like('customer', '%Corp%');
+
+      expect(filter.operator, equals('like'));
+      expect(filter.toJson(), equals(['customer', 'like', '%Corp%']));
+    });
+
+    test('notLike filter creates correct JSON', () {
+      const filter = Filter.notLike('customer', '%Test%');
+
+      expect(filter.operator, equals('not like'));
+      expect(filter.toJson(), equals(['customer', 'not like', '%Test%']));
+    });
+
+    test('isIn filter creates correct JSON', () {
+      const filter = Filter.isIn('type', ['Sales', 'Purchase']);
+
+      expect(filter.operator, equals('in'));
+      expect(
+        filter.toJson(),
+        equals([
+          'type',
+          'in',
+          ['Sales', 'Purchase'],
+        ]),
+      );
+    });
+
+    test('notIn filter creates correct JSON', () {
+      const filter = Filter.notIn('status', ['Cancelled', 'Closed']);
+
+      expect(filter.operator, equals('not in'));
+      expect(
+        filter.toJson(),
+        equals([
+          'status',
+          'not in',
+          ['Cancelled', 'Closed'],
+        ]),
+      );
+    });
+
+    test('isNull filter creates correct JSON', () {
+      const filter = Filter.isNull('parent');
+
+      expect(filter.operator, equals('is'));
+      expect(filter.value, isNull);
+      expect(filter.toJson(), equals(['parent', 'is', null]));
+    });
+
+    test('isNotNull filter creates correct JSON', () {
+      const filter = Filter.isNotNull('parent');
+
+      expect(filter.operator, equals('is not'));
+      expect(filter.value, isNull);
+      expect(filter.toJson(), equals(['parent', 'is not', null]));
+    });
+
+    test('toString returns readable format', () {
+      const filter = Filter.equal('status', 'Open');
+
+      expect(filter.toString(), equals('Filter(status = Open)'));
     });
   });
 
@@ -93,9 +232,25 @@ void main() {
       expect(params, isEmpty);
     });
 
-    test('converts filters to query params', () {
+    test('converts Filter list to query params', () {
       const options = QueryOptions(
-        filters: '[["status", "=", "Open"]]',
+        filters: [
+          Filter.equal('status', 'Open'),
+          Filter.greaterThan('amount', 1000),
+        ],
+      );
+      final params = options.toQueryParams();
+
+      expect(params['filters'], isNotNull);
+      expect(
+        params['filters'],
+        equals('[["status","=","Open"],["amount",">",1000]]'),
+      );
+    });
+
+    test('converts filtersJson to query params', () {
+      const options = QueryOptions(
+        filtersJson: '[["status", "=", "Open"]]',
       );
       final params = options.toQueryParams();
 
@@ -131,9 +286,12 @@ void main() {
       expect(params['limit_start'], equals('40'));
     });
 
-    test('converts all options together', () {
+    test('converts all options together with Filter list', () {
       const options = QueryOptions(
-        filters: '[["enabled", "=", 1]]',
+        filters: [
+          Filter.equal('enabled', 1),
+          Filter.like('name', '%test%'),
+        ],
         fields: ['name', 'full_name'],
         orderBy: 'creation asc',
         limitPageLength: 10,
@@ -141,7 +299,7 @@ void main() {
       );
       final params = options.toQueryParams();
 
-      expect(params['filters'], equals('[["enabled", "=", 1]]'));
+      expect(params['filters'], isNotNull);
       expect(params['fields'], equals('["name","full_name"]'));
       expect(params['order_by'], equals('creation asc'));
       expect(params['limit_page_length'], equals('10'));
@@ -153,6 +311,13 @@ void main() {
       final params = options.toQueryParams();
 
       expect(params.containsKey('fields'), isFalse);
+    });
+
+    test('ignores empty filters list', () {
+      const options = QueryOptions(filters: []);
+      final params = options.toQueryParams();
+
+      expect(params.containsKey('filters'), isFalse);
     });
   });
 }

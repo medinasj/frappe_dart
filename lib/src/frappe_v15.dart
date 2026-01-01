@@ -1215,7 +1215,7 @@ class FrappeV15 implements FrappeApi {
         final errorMessage = response.data?['message'] as String? ??
             'Failed to get resource list';
         return ApiResult.failure(
-          FrappeException(
+          FrappeException.fromStatusCode(
             message: errorMessage,
             statusCode: response.statusCode,
             data: response.data,
@@ -1224,7 +1224,7 @@ class FrappeV15 implements FrappeApi {
       }
     } on DioException catch (e) {
       return ApiResult.failure(
-        FrappeException(
+        FrappeException.fromStatusCode(
           message: handleDioError(e),
           statusCode: e.response?.statusCode,
           data: e.response?.data,
@@ -1232,7 +1232,7 @@ class FrappeV15 implements FrappeApi {
       );
     } catch (e) {
       return ApiResult.failure(
-        FrappeException(message: 'Failed to get resource list: $e'),
+        FrappeException.fromStatusCode(message: 'Failed to get resource list: $e'),
       );
     }
   }
@@ -1271,7 +1271,7 @@ class FrappeV15 implements FrappeApi {
         final errorMessage =
             response.data?['message'] as String? ?? 'Failed to get resource';
         return ApiResult.failure(
-          FrappeException(
+          FrappeException.fromStatusCode(
             message: errorMessage,
             statusCode: response.statusCode,
             data: response.data,
@@ -1280,7 +1280,7 @@ class FrappeV15 implements FrappeApi {
       }
     } on DioException catch (e) {
       return ApiResult.failure(
-        FrappeException(
+        FrappeException.fromStatusCode(
           message: handleDioError(e),
           statusCode: e.response?.statusCode,
           data: e.response?.data,
@@ -1288,7 +1288,7 @@ class FrappeV15 implements FrappeApi {
       );
     } catch (e) {
       return ApiResult.failure(
-        FrappeException(message: 'Failed to get resource: $e'),
+        FrappeException.fromStatusCode(message: 'Failed to get resource: $e'),
       );
     }
   }
@@ -1331,7 +1331,7 @@ class FrappeV15 implements FrappeApi {
         final errorMessage =
             response.data?['message'] as String? ?? 'Failed to create resource';
         return ApiResult.failure(
-          FrappeException(
+          FrappeException.fromStatusCode(
             message: errorMessage,
             statusCode: response.statusCode,
             data: response.data,
@@ -1340,7 +1340,7 @@ class FrappeV15 implements FrappeApi {
       }
     } on DioException catch (e) {
       return ApiResult.failure(
-        FrappeException(
+        FrappeException.fromStatusCode(
           message: handleDioError(e),
           statusCode: e.response?.statusCode,
           data: e.response?.data,
@@ -1348,7 +1348,7 @@ class FrappeV15 implements FrappeApi {
       );
     } catch (e) {
       return ApiResult.failure(
-        FrappeException(message: 'Failed to create resource: $e'),
+        FrappeException.fromStatusCode(message: 'Failed to create resource: $e'),
       );
     }
   }
@@ -1389,7 +1389,7 @@ class FrappeV15 implements FrappeApi {
         final errorMessage =
             response.data?['message'] as String? ?? 'Failed to update resource';
         return ApiResult.failure(
-          FrappeException(
+          FrappeException.fromStatusCode(
             message: errorMessage,
             statusCode: response.statusCode,
             data: response.data,
@@ -1398,7 +1398,7 @@ class FrappeV15 implements FrappeApi {
       }
     } on DioException catch (e) {
       return ApiResult.failure(
-        FrappeException(
+        FrappeException.fromStatusCode(
           message: handleDioError(e),
           statusCode: e.response?.statusCode,
           data: e.response?.data,
@@ -1406,7 +1406,7 @@ class FrappeV15 implements FrappeApi {
       );
     } catch (e) {
       return ApiResult.failure(
-        FrappeException(message: 'Failed to update resource: $e'),
+        FrappeException.fromStatusCode(message: 'Failed to update resource: $e'),
       );
     }
   }
@@ -1446,7 +1446,7 @@ class FrappeV15 implements FrappeApi {
         final errorMessage =
             response.data?['message'] as String? ?? 'Failed to delete resource';
         return ApiResult.failure(
-          FrappeException(
+          FrappeException.fromStatusCode(
             message: errorMessage,
             statusCode: response.statusCode,
             data: response.data,
@@ -1455,7 +1455,7 @@ class FrappeV15 implements FrappeApi {
       }
     } on DioException catch (e) {
       return ApiResult.failure(
-        FrappeException(
+        FrappeException.fromStatusCode(
           message: handleDioError(e),
           statusCode: e.response?.statusCode,
           data: e.response?.data,
@@ -1463,7 +1463,7 @@ class FrappeV15 implements FrappeApi {
       );
     } catch (e) {
       return ApiResult.failure(
-        FrappeException(message: 'Failed to delete resource: $e'),
+        FrappeException.fromStatusCode(message: 'Failed to delete resource: $e'),
       );
     }
   }
@@ -1514,7 +1514,7 @@ class FrappeV15 implements FrappeApi {
         final errorMessage =
             response.data?['message'] as String? ?? 'Failed to set value';
         return ApiResult.failure(
-          FrappeException(
+          FrappeException.fromStatusCode(
             message: errorMessage,
             statusCode: response.statusCode,
             data: response.data,
@@ -1523,7 +1523,7 @@ class FrappeV15 implements FrappeApi {
       }
     } on DioException catch (e) {
       return ApiResult.failure(
-        FrappeException(
+        FrappeException.fromStatusCode(
           message: handleDioError(e),
           statusCode: e.response?.statusCode,
           data: e.response?.data,
@@ -1531,7 +1531,7 @@ class FrappeV15 implements FrappeApi {
       );
     } catch (e) {
       return ApiResult.failure(
-        FrappeException(message: 'Failed to set value: $e'),
+        FrappeException.fromStatusCode(message: 'Failed to set value: $e'),
       );
     }
   }
@@ -1575,7 +1575,7 @@ class FrappeV15 implements FrappeApi {
         final errorMessage =
             response.data?['message'] as String? ?? 'Failed to call method';
         return ApiResult.failure(
-          FrappeException(
+          FrappeException.fromStatusCode(
             message: errorMessage,
             statusCode: response.statusCode,
             data: response.data,
@@ -1584,7 +1584,7 @@ class FrappeV15 implements FrappeApi {
       }
     } on DioException catch (e) {
       return ApiResult.failure(
-        FrappeException(
+        FrappeException.fromStatusCode(
           message: handleDioError(e),
           statusCode: e.response?.statusCode,
           data: e.response?.data,
@@ -1592,7 +1592,7 @@ class FrappeV15 implements FrappeApi {
       );
     } catch (e) {
       return ApiResult.failure(
-        FrappeException(message: 'Failed to call method: $e'),
+        FrappeException.fromStatusCode(message: 'Failed to call method: $e'),
       );
     }
   }
@@ -1632,7 +1632,7 @@ class FrappeV15 implements FrappeApi {
         final errorMessage =
             response.data?['message'] as String? ?? 'Failed to call method';
         return ApiResult.failure(
-          FrappeException(
+          FrappeException.fromStatusCode(
             message: errorMessage,
             statusCode: response.statusCode,
             data: response.data,
@@ -1641,7 +1641,7 @@ class FrappeV15 implements FrappeApi {
       }
     } on DioException catch (e) {
       return ApiResult.failure(
-        FrappeException(
+        FrappeException.fromStatusCode(
           message: handleDioError(e),
           statusCode: e.response?.statusCode,
           data: e.response?.data,
@@ -1649,7 +1649,7 @@ class FrappeV15 implements FrappeApi {
       );
     } catch (e) {
       return ApiResult.failure(
-        FrappeException(message: 'Failed to call method: $e'),
+        FrappeException.fromStatusCode(message: 'Failed to call method: $e'),
       );
     }
   }

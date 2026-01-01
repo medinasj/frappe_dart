@@ -1,3 +1,17 @@
+## 0.0.8
+
+- **feat**: add Filter class for type-safe filter building inspired by frappe_sdk
+- **feat**: add FrappeDoc base class for standardized document models
+- **feat**: add specific exception types (FrappeNotFoundException, FrappeUnauthorizedException, FrappeForbiddenException, FrappeServerException)
+- **feat**: add factory constructor to FrappeException for automatic exception type selection based on status code
+- **feat**: enhance QueryOptions to support both Filter objects and JSON string filters
+- **docs**: update README with Filter class examples and usage patterns
+- **docs**: add FrappeDoc usage examples for type-safe document models
+- **docs**: add specific exception handling examples
+- **test**: add comprehensive tests for Filter class (24 new tests)
+- **test**: add tests for new exception types
+- **chore**: improve code based on frappe_sdk best practices
+
 ## 0.0.7
 
 - **feat**: add Resource API methods with ApiResult wrapper for better error handling
