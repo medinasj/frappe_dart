@@ -653,14 +653,14 @@ class FrappeV16 implements FrappeApi {
         return UserInfoResponse.fromMap(response.data!);
       } else {
         throw Exception(
-          'Failed to get apps. Response Status: ${response.statusCode}',
+          'Failed to get user info. Response Status: ${response.statusCode}',
         );
       }
     } on DioException catch (e) {
       throw Exception(handleDioError(e));
     } catch (e) {
       throw Exception(
-        '''An unknown error occurred while retrieving apps: $e''',
+        '''An unknown error occurred while retrieving user info: $e''',
       );
     }
   }
@@ -1093,12 +1093,11 @@ class FrappeV16 implements FrappeApi {
           'txt': txt,
           'filters': jsonEncode(filters),
           if (filterFields != null) 'filter_fields': jsonEncode(filterFields),
-          'page_length': '25',
+          'page_length': pageLength,
           'as_dict': '1',
           if (query.isNotEmpty) 'query': query,
           if (searchField != null) 'search_field': searchField,
           if (start != '0') 'start': start,
-          if (pageLength != '10') 'page_length': pageLength,
         },
         options: Options(
           headers: {'Content-Type': 'application/json', 'Cookie': cookie ?? ''},
