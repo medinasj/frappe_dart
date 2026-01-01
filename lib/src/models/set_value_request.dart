@@ -36,15 +36,23 @@ class SetValueRequest {
   /// Value to set (only for single field, otherwise null)
   dynamic value;
 
-  Map<String, dynamic> toMap() => {
-        'doctype': doctype,
-        'name': name,
-        if (fieldname is String && value != null)
-          'fieldname': fieldname
-        else if (fieldname is Map)
-          'fieldname': json.encode(fieldname),
-        if (value != null && fieldname is String) 'value': value,
-      };
+  Map<String, dynamic> toMap() {
+    final map = <String, dynamic>{
+      'doctype': doctype,
+      'name': name,
+    };
+
+    if (fieldname is String) {
+      map['fieldname'] = fieldname as String;
+      if (value != null) {
+        map['value'] = value;
+      }
+    } else if (fieldname is Map) {
+      map['fieldname'] = json.encode(fieldname);
+    }
+
+    return map;
+  }
 
   /// `dart:convert`
   ///

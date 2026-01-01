@@ -18,6 +18,18 @@ void main() {
     frappeApi = FrappeV15(baseUrl: 'https://example.com', dio: mockDio);
   });
 
+  /// Helper to create a mock response
+  Response<Map<String, dynamic>> mockResponse(
+    Map<String, dynamic> data, [
+    int statusCode = 200,
+  ]) {
+    return Response(
+      data: data,
+      statusCode: statusCode,
+      requestOptions: RequestOptions(),
+    );
+  }
+
   group('frappe.client API methods', () {
     test('insert should return created document when successful', () async {
       final insertRequest = InsertRequest(
@@ -33,13 +45,7 @@ void main() {
           data: anyNamed('data'),
           options: anyNamed('options'),
         ),
-      ).thenAnswer(
-        (_) async => Response(
-          data: responseData,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ),
-      );
+      ).thenAnswer((_) async => mockResponse(responseData));
 
       final response = await frappeApi.insert(insertRequest);
 
@@ -64,13 +70,7 @@ void main() {
           data: anyNamed('data'),
           options: anyNamed('options'),
         ),
-      ).thenAnswer(
-        (_) async => Response(
-          data: responseData,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ),
-      );
+      ).thenAnswer((_) async => mockResponse(responseData));
 
       final response = await frappeApi.setValue(setValueRequest);
 
@@ -93,13 +93,7 @@ void main() {
           data: anyNamed('data'),
           options: anyNamed('options'),
         ),
-      ).thenAnswer(
-        (_) async => Response(
-          data: responseData,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ),
-      );
+      ).thenAnswer((_) async => mockResponse(responseData));
 
       final response = await frappeApi.renameDoc(renameDocRequest);
 
@@ -120,13 +114,7 @@ void main() {
           data: anyNamed('data'),
           options: anyNamed('options'),
         ),
-      ).thenAnswer(
-        (_) async => Response(
-          data: responseData,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ),
-      );
+      ).thenAnswer((_) async => mockResponse(responseData));
 
       final response = await frappeApi.submitDoc(submitDocRequest);
 
@@ -148,13 +136,7 @@ void main() {
           data: anyNamed('data'),
           options: anyNamed('options'),
         ),
-      ).thenAnswer(
-        (_) async => Response(
-          data: responseData,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ),
-      );
+      ).thenAnswer((_) async => mockResponse(responseData));
 
       final response = await frappeApi.cancelDoc(cancelDocRequest);
 
@@ -176,13 +158,7 @@ void main() {
           data: anyNamed('data'),
           options: anyNamed('options'),
         ),
-      ).thenAnswer(
-        (_) async => Response(
-          data: responseData,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ),
-      );
+      ).thenAnswer((_) async => mockResponse(responseData));
 
       final response = await frappeApi.exists(existsRequest);
 
@@ -205,13 +181,7 @@ void main() {
           queryParameters: anyNamed('queryParameters'),
           options: anyNamed('options'),
         ),
-      ).thenAnswer(
-        (_) async => Response(
-          data: responseData,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ),
-      );
+      ).thenAnswer((_) async => mockResponse(responseData));
 
       final response = await frappeApi.getResourceList('Task');
 
@@ -229,13 +199,7 @@ void main() {
           any,
           options: anyNamed('options'),
         ),
-      ).thenAnswer(
-        (_) async => Response(
-          data: responseData,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ),
-      );
+      ).thenAnswer((_) async => mockResponse(responseData));
 
       final response = await frappeApi.getResource('Task', 'TASK-0001');
 
@@ -255,13 +219,7 @@ void main() {
           data: anyNamed('data'),
           options: anyNamed('options'),
         ),
-      ).thenAnswer(
-        (_) async => Response(
-          data: responseData,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ),
-      );
+      ).thenAnswer((_) async => mockResponse(responseData));
 
       final response = await frappeApi.createResource('Task', docData);
 
@@ -281,13 +239,7 @@ void main() {
           data: anyNamed('data'),
           options: anyNamed('options'),
         ),
-      ).thenAnswer(
-        (_) async => Response(
-          data: responseData,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ),
-      );
+      ).thenAnswer((_) async => mockResponse(responseData));
 
       final response =
           await frappeApi.updateResource('Task', 'TASK-0001', docData);
@@ -306,13 +258,7 @@ void main() {
           any,
           options: anyNamed('options'),
         ),
-      ).thenAnswer(
-        (_) async => Response(
-          data: responseData,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ),
-      );
+      ).thenAnswer((_) async => mockResponse(responseData));
 
       final response = await frappeApi.deleteResource('Task', 'TASK-0001');
 
