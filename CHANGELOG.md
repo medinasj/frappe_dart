@@ -1,3 +1,23 @@
+## 0.0.7
+
+- **feat**: add Resource API methods with ApiResult wrapper for better error handling
+- **feat**: add ApiResult<T> class for clean error handling with data or error states
+- **feat**: add FrappeException class for detailed API error information
+- **feat**: add QueryOptions class for cleaner query parameter handling with filters, fields, sorting, and pagination
+- **feat**: add CookieManager interface for flexible cookie storage implementation
+- **feat**: implement getResourceList method for retrieving filtered and sorted resource lists
+- **feat**: implement getResource method for fetching single resources by name
+- **feat**: implement createResource method for creating new resources via REST API
+- **feat**: implement updateResource method for updating existing resources
+- **feat**: implement deleteResource method for deleting resources
+- **feat**: add setFieldValue method for updating individual document fields
+- **feat**: add callFrappeMethod and callFrappeMethodGet for custom server-side method calls
+- **docs**: update README with comprehensive examples for Resource API usage
+- **docs**: add documentation for QueryOptions with filter operators and pagination
+- **docs**: add error handling examples with ApiResult pattern
+- **test**: add comprehensive test coverage for ApiResult, FrappeException, and QueryOptions
+- **chore**: improve code based on flutter_next_base best practices
+
 ## 0.0.6
 
 - **feat**: implement client get api endpoint
