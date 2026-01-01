@@ -39,7 +39,7 @@ class FrappeV16 implements FrappeApi {
     _cookie = newCookie;
   }
 
-  ///getter of dio
+  /// Gets the Dio instance.
   Dio get dio => _dio;
 
   @override
@@ -984,6 +984,7 @@ class FrappeV16 implements FrappeApi {
     }
   }
 
+  @override
   Future<ReportViewResponse> getReportView(
     ReportViewRequest reportViewRequest,
   ) async {
@@ -1043,7 +1044,6 @@ class FrappeV16 implements FrappeApi {
       if (response.statusCode == HttpStatus.ok) {
         return response.data!;
       } else {
-        print('Server error: ${response.statusCode}');
         throw Exception('Failed to fetch data: ${response.statusCode}');
       }
     } catch (e) {
