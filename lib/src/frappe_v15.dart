@@ -572,112 +572,100 @@ class FrappeV15 implements FrappeApi {
   Future<LoggedUserResponse> getLoggerUser() async {
     final url = '$_baseUrl/api/method/frappe.auth.get_logged_user';
 
-    try {
-      final response = await _dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Cookie': _cookie ?? '',
-          },
-        ),
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return LoggedUserResponse.fromMap(response.data!);
-      } else {
-        throw Exception(
-          'Failed to get logged user. Response Status: ${response.statusCode}',
+    return _executeRequest(
+      () async {
+        final response = await _dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Cookie': _cookie ?? '',
+            },
+          ),
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception(
-        '''An unknown error occurred while retrieving logged user: $e''',
-      );
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return LoggedUserResponse.fromMap(response.data!);
+        } else {
+          throw Exception(
+            'Failed to get logged user. Response Status: ${response.statusCode}',
+          );
+        }
+      },
+      'An unknown error occurred while retrieving logged user',
+    );
   }
 
   @override
   Future<AppsResponse> getApps() async {
     final url = '$_baseUrl/api/method/frappe.apps.get_apps';
-    try {
-      final response = await _dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Cookie': _cookie ?? '',
-          },
-        ),
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return AppsResponse.fromMap(response.data!);
-      } else {
-        throw Exception(
-          'Failed to get apps. Response Status: ${response.statusCode}',
+    return _executeRequest(
+      () async {
+        final response = await _dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Cookie': _cookie ?? '',
+            },
+          ),
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception(
-        '''An unknown error occurred while retrieving apps: $e''',
-      );
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return AppsResponse.fromMap(response.data!);
+        } else {
+          throw Exception(
+            'Failed to get apps. Response Status: ${response.statusCode}',
+          );
+        }
+      },
+      'An unknown error occurred while retrieving apps',
+    );
   }
 
   @override
   Future<UserInfoResponse> getUserInfo() async {
     final url = '$_baseUrl/api/method/frappe.realtime.get_user_info';
-    try {
-      final response = await _dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Cookie': _cookie ?? '',
-          },
-        ),
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return UserInfoResponse.fromMap(response.data!);
-      } else {
-        throw Exception(
-          'Failed to get apps. Response Status: ${response.statusCode}',
+    return _executeRequest(
+      () async {
+        final response = await _dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Cookie': _cookie ?? '',
+            },
+          ),
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception(
-        '''An unknown error occurred while retrieving apps: $e''',
-      );
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return UserInfoResponse.fromMap(response.data!);
+        } else {
+          throw Exception(
+            'Failed to get apps. Response Status: ${response.statusCode}',
+          );
+        }
+      },
+      'An unknown error occurred while retrieving apps',
+    );
   }
 
   @override
   Future<PingResponse> ping() async {
     final url = '$_baseUrl/api/method/ping';
-    try {
-      final response = await _dio.post<Map<String, dynamic>>(
-        url,
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return PingResponse.fromMap(response.data!);
-      } else {
-        throw Exception(
-          'Failed to ping. Response Status: ${response.statusCode}',
+    return _executeRequest(
+      () async {
+        final response = await _dio.post<Map<String, dynamic>>(
+          url,
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception(
-        '''An unknown error occurred while pinging: $e''',
-      );
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return PingResponse.fromMap(response.data!);
+        } else {
+          throw Exception(
+            'Failed to ping. Response Status: ${response.statusCode}',
+          );
+        }
+      },
+      'An unknown error occurred while pinging',
+    );
   }
 
   @override
