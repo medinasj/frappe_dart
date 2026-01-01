@@ -237,14 +237,14 @@ class FrappeV16 implements FrappeApi {
         return NumberCardPercentageDifferenceResponse.fromMap(response.data!);
       } else {
         throw Exception(
-          '''Failed to get desk number card. Response Status: ${response.statusCode}''',
+          '''Failed to get number card percentage difference. Response Status: ${response.statusCode}''',
         );
       }
     } on DioException catch (e) {
       throw Exception(handleDioError(e));
     } catch (e) {
       throw Exception(
-        '''An unknown error occurred while retrieving number card: $e''',
+        '''An unknown error occurred while retrieving number card percentage difference: $e''',
       );
     }
   }
