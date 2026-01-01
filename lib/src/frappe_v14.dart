@@ -39,7 +39,7 @@ class FrappeV14 implements FrappeApi {
     _cookie = newCookie;
   }
 
-  ///getter of dio
+  /// Getter for the Dio instance.
   Dio get dio => _dio;
 
   @override
@@ -971,6 +971,7 @@ class FrappeV14 implements FrappeApi {
     }
   }
 
+  @override
   Future<ReportViewResponse> getReportView(
     ReportViewRequest reportViewRequest,
   ) async {
@@ -1030,7 +1031,6 @@ class FrappeV14 implements FrappeApi {
       if (response.statusCode == HttpStatus.ok) {
         return response.data!;
       } else {
-        print('Server error: ${response.statusCode}');
         throw Exception('Failed to fetch data: ${response.statusCode}');
       }
     } catch (e) {
@@ -1093,12 +1093,11 @@ class FrappeV14 implements FrappeApi {
           'txt': txt,
           'filters': jsonEncode(filters),
           if (filterFields != null) 'filter_fields': jsonEncode(filterFields),
-          'page_length': '25',
+          'page_length': pageLength,
           'as_dict': '1',
           if (query.isNotEmpty) 'query': query,
           if (searchField != null) 'search_field': searchField,
           if (start != '0') 'start': start,
-          if (pageLength != '10') 'page_length': pageLength,
         },
         options: Options(
           headers: {'Content-Type': 'application/json', 'Cookie': cookie ?? ''},
