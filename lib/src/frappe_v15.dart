@@ -892,41 +892,40 @@ class FrappeV15 implements FrappeApi {
     final url =
         '$baseUrl/api/method/frappe.core.doctype.communication.email.make';
 
-    try {
-      final response = await dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Cookie': cookie ?? '',
+    return _executeRequest(
+      () async {
+        final response = await dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Cookie': cookie ?? '',
+            },
+          ),
+          data: {
+            'recipients': recipients,
+            'subject': subject,
+            'content': content,
+            'doctype': doctype,
+            'name': name,
+            'send_email': sendEmail,
+            'print_format': printFormat,
+            'sender_full_name': senderFullName,
+            '_lang': lang,
           },
-        ),
-        data: {
-          'recipients': recipients,
-          'subject': subject,
-          'content': content,
-          'doctype': doctype,
-          'name': name,
-          'send_email': sendEmail,
-          'print_format': printFormat,
-          'sender_full_name': senderFullName,
-          '_lang': lang,
-        },
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return SendEmailResponse.fromMap(response.data!);
-      } else {
-        final res = ErrorResponse.fromMap(response.data!);
-        throw Exception(
-          'Failed to send email. HTTP Status: ${response.statusCode}, data: ${res.exception}',
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception('An error occurred while sending email: $e');
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return SendEmailResponse.fromMap(response.data!);
+        } else {
+          final res = ErrorResponse.fromMap(response.data!);
+          throw Exception(
+            'Failed to send email. HTTP Status: ${response.statusCode}, data: ${res.exception}',
+          );
+        }
+      },
+      'An error occurred while sending email',
+    );
   }
 
   @override
@@ -935,33 +934,30 @@ class FrappeV15 implements FrappeApi {
   ) async {
     final url = '$baseUrl/api/method/frappe.desk.reportview.get_list';
 
-    try {
-      final response = await dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/json',
-            'Cookie': cookie ?? '',
-          },
-        ),
-        data: jsonEncode(reportViewRequest.toMap()),
-      );
-
-      if (response.statusCode == 200) {
-        // Decode the response body into a Map and explicitly cast it
-        return ReportViewResponse.fromJson(response.data!);
-      } else {
-        throw Exception(
-          'Failed to get list. HTTP Status: ${response.statusCode}, Response: ${response.data!}',
+    return _executeRequest(
+      () async {
+        final response = await dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Content-Type': 'application/json',
+              'Cookie': cookie ?? '',
+            },
+          ),
+          data: jsonEncode(reportViewRequest.toMap()),
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception(
-        'An error occurred while fetching the list: $e',
-      );
-    }
+
+        if (response.statusCode == 200) {
+          // Decode the response body into a Map and explicitly cast it
+          return ReportViewResponse.fromJson(response.data!);
+        } else {
+          throw Exception(
+            'Failed to get list. HTTP Status: ${response.statusCode}, Response: ${response.data!}',
+          );
+        }
+      },
+      'An error occurred while fetching the list',
+    );
   }
 
   @override
@@ -970,31 +966,31 @@ class FrappeV15 implements FrappeApi {
     required Map<String, dynamic> targetDoc,
     required String method,
   }) async {
-    try {
-      final payload = 'method=$method'
-          '&source_names=${Uri.encodeComponent(jsonEncode(sourceName))}'
-          '&target_doc=${Uri.encodeComponent(json.encode(targetDoc))}';
+    return _executeRequest(
+      () async {
+        final payload = 'method=$method'
+            '&source_names=${Uri.encodeComponent(jsonEncode(sourceName))}'
+            '&target_doc=${Uri.encodeComponent(json.encode(targetDoc))}';
 
-      final response = await dio.post<Map<String, dynamic>>(
-        '$baseUrl/api/method/frappe.model.mapper.map_docs',
-        data: payload,
-        options: Options(
-          contentType: Headers.formUrlEncodedContentType,
-          headers: {
-            'Cookie': cookie ?? '',
-          },
-        ),
-      );
+        final response = await dio.post<Map<String, dynamic>>(
+          '$baseUrl/api/method/frappe.model.mapper.map_docs',
+          data: payload,
+          options: Options(
+            contentType: Headers.formUrlEncodedContentType,
+            headers: {
+              'Cookie': cookie ?? '',
+            },
+          ),
+        );
 
-      if (response.statusCode == HttpStatus.ok) {
-        return response.data!;
-      } else {
-        print('Server error: ${response.statusCode}');
-        throw Exception('Failed to fetch data: ${response.statusCode}');
-      }
-    } catch (e) {
-      throw Exception('An error occurred: $e');
-    }
+        if (response.statusCode == HttpStatus.ok) {
+          return response.data!;
+        } else {
+          throw Exception('Failed to fetch data: ${response.statusCode}');
+        }
+      },
+      'An error occurred',
+    );
   }
 
   @override
@@ -1004,33 +1000,32 @@ class FrappeV15 implements FrappeApi {
     final url =
         '$baseUrl/api/method/frappe.core.doctype.user.user.switch_theme';
 
-    try {
-      final payload = {
-        'theme': theme,
-      };
-      final response = await dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Cookie': cookie ?? '',
-          },
-        ),
-        data: payload,
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return response.data!;
-      } else {
-        throw Exception(
-          'Failed to switch theme. HTTP Status: ${response.statusCode}, data: ${response.data!}',
+    return _executeRequest(
+      () async {
+        final payload = {
+          'theme': theme,
+        };
+        final response = await dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Cookie': cookie ?? '',
+            },
+          ),
+          data: payload,
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception('An error occurred while switching theme: $e');
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return response.data!;
+        } else {
+          throw Exception(
+            'Failed to switch theme. HTTP Status: ${response.statusCode}, data: ${response.data!}',
+          );
+        }
+      },
+      'An error occurred while switching theme',
+    );
   }
 
   @override
@@ -1044,40 +1039,41 @@ class FrappeV15 implements FrappeApi {
     String start = '0',
     String pageLength = '10',
   }) async {
-    try {
-      final response = await dio.get<Map<String, dynamic>>(
-        '$baseUrl/api/method/frappe.desk.search.search_widget',
-        queryParameters: {
-          'doctype': doctype,
-          'txt': txt,
-          'filters': jsonEncode(filters),
-          if (filterFields != null) 'filter_fields': jsonEncode(filterFields),
-          'page_length': '25',
-          'as_dict': '1',
-          if (query.isNotEmpty) 'query': query,
-          if (searchField != null) 'search_field': searchField,
-          if (start != '0') 'start': start,
-          if (pageLength != '10') 'page_length': pageLength,
-        },
-        options: Options(
-          headers: {'Content-Type': 'application/json', 'Cookie': cookie ?? ''},
-        ),
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return response.data!;
-      } else {
-        throw Exception(
-          '''An unknown error occurred while calling''',
+    return _executeRequest(
+      () async {
+        final response = await dio.get<Map<String, dynamic>>(
+          '$baseUrl/api/method/frappe.desk.search.search_widget',
+          queryParameters: {
+            'doctype': doctype,
+            'txt': txt,
+            'filters': jsonEncode(filters),
+            if (filterFields != null)
+              'filter_fields': jsonEncode(filterFields),
+            'page_length': '25',
+            'as_dict': '1',
+            if (query.isNotEmpty) 'query': query,
+            if (searchField != null) 'search_field': searchField,
+            if (start != '0') 'start': start,
+            if (pageLength != '10') 'page_length': pageLength,
+          },
+          options: Options(
+            headers: {
+              'Content-Type': 'application/json',
+              'Cookie': cookie ?? '',
+            },
+          ),
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception(
-        '''An unknown error occurred while calling: $e''',
-      );
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return response.data!;
+        } else {
+          throw Exception(
+            '''An unknown error occurred while calling''',
+          );
+        }
+      },
+      'An unknown error occurred while calling',
+    );
   }
 
   @override
@@ -1087,32 +1083,31 @@ class FrappeV15 implements FrappeApi {
   }) async {
     final url = '$baseUrl/api/method/run_doc_method';
 
-    try {
-      final response = await dio.post<Map<String, dynamic>>(
-        url,
-        options: Options(
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-            'Cookie': cookie ?? '',
+    return _executeRequest(
+      () async {
+        final response = await dio.post<Map<String, dynamic>>(
+          url,
+          options: Options(
+            headers: {
+              'Content-Type': 'application/x-www-form-urlencoded',
+              'Cookie': cookie ?? '',
+            },
+          ),
+          data: {
+            'docs': json.encode(data),
+            'method': method,
           },
-        ),
-        data: {
-          'docs': json.encode(data),
-          'method': method,
-        },
-      );
-
-      if (response.statusCode == HttpStatus.ok) {
-        return response.data!;
-      } else {
-        throw Exception(
-          'Failed to run doc method. HTTP Status: ${response.statusCode}, data: ${response.data!}',
         );
-      }
-    } on DioException catch (e) {
-      throw Exception(handleDioError(e));
-    } catch (e) {
-      throw Exception('An error occurred while running doc method: $e');
-    }
+
+        if (response.statusCode == HttpStatus.ok) {
+          return response.data!;
+        } else {
+          throw Exception(
+            'Failed to run doc method. HTTP Status: ${response.statusCode}, data: ${response.data!}',
+          );
+        }
+      },
+      'An error occurred while running doc method',
+    );
   }
 }
