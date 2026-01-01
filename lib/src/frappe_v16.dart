@@ -504,14 +504,14 @@ class FrappeV16 implements FrappeApi {
         return response.data!;
       } else {
         throw Exception(
-          'Failed to search link. Response Status: ${response.statusCode}',
+          'Failed to validate link. Response Status: ${response.statusCode}',
         );
       }
     } on DioException catch (e) {
       throw Exception(handleDioError(e));
     } catch (e) {
       throw Exception(
-        '''An unknown error occurred while searching for link: $e''',
+        '''An unknown error occurred while validating link: $e''',
       );
     }
   }
@@ -1108,14 +1108,14 @@ class FrappeV16 implements FrappeApi {
         return response.data!;
       } else {
         throw Exception(
-          '''An unknown error occurred while calling''',
+          '''Failed to search widget. Response Status: ${response.statusCode}''',
         );
       }
     } on DioException catch (e) {
       throw Exception(handleDioError(e));
     } catch (e) {
       throw Exception(
-        '''An unknown error occurred while calling: $e''',
+        '''An unknown error occurred while searching widget: $e''',
       );
     }
   }
