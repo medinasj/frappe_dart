@@ -1,3 +1,7 @@
+## Unreleased
+
+- **feat**: implement Frappe v16 support - Added FrappeV16 class with full API compatibility
+
 ## 0.0.6
 
 - **feat**: implement client get api endpoint
