@@ -14,16 +14,26 @@
 /// );
 /// ```
 class QueryOptions {
+  /// Creates a new [QueryOptions] instance.
+  const QueryOptions({
+    this.filters,
+    this.fields,
+    this.orderBy,
+    this.limitPageLength,
+    this.limitStart,
+  });
+
   /// Filter conditions as a JSON array string.
   ///
   /// Each filter is an array: `[fieldname, operator, value]`
   ///
   /// Examples:
   /// - Single filter: `'[["status", "=", "Open"]]'`
-  /// - Multiple filters: `'[["status", "=", "Open"], ["date", ">=", "2025-01-01"]]'`
+  /// - Multiple filters:
+  /// `'[["status", "=", "Open"], ["date", ">=", "2025-01-01"]]'`
   ///
-  /// Available operators: `=`, `!=`, `>`, `<`, `>=`, `<=`, `like`, `not like`,
-  /// `in`, `not in`, `is`, `is not`
+  /// Available operators: `=`, `!=`, `>`, `<`, `>=`, `<=`, `like`,
+  /// `not like`, `in`, `not in`, `is`, `is not`
   final String? filters;
 
   /// Fields to include in the response.
@@ -47,17 +57,9 @@ class QueryOptions {
 
   /// Starting index for pagination.
   ///
-  /// Use 0 for first page, 20 for second page (if limitPageLength is 20), etc.
+  /// Use 0 for first page, 20 for second page
+  /// (if limitPageLength is 20), etc.
   final int? limitStart;
-
-  /// Creates a new [QueryOptions] instance.
-  const QueryOptions({
-    this.filters,
-    this.fields,
-    this.orderBy,
-    this.limitPageLength,
-    this.limitStart,
-  });
 
   /// Converts options to query parameters.
   Map<String, String> toQueryParams() {

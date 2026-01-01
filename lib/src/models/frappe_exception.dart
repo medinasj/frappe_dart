@@ -3,6 +3,13 @@
 /// This provides detailed information about API failures including
 /// status code and additional error data from the server.
 class FrappeException implements Exception {
+  /// Creates a new [FrappeException].
+  const FrappeException({
+    required this.message,
+    this.statusCode,
+    this.data,
+  });
+
   /// The error message.
   final String message;
 
@@ -11,13 +18,6 @@ class FrappeException implements Exception {
 
   /// Additional error data from the server.
   final Map<String, dynamic>? data;
-
-  /// Creates a new [FrappeException].
-  const FrappeException({
-    required this.message,
-    this.statusCode,
-    this.data,
-  });
 
   @override
   String toString() {

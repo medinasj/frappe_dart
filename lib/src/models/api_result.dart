@@ -16,18 +16,6 @@ import 'package:frappe_dart/src/models/frappe_exception.dart';
 /// }
 /// ```
 class ApiResult<T> {
-  /// The data returned from the API, if successful.
-  final T? data;
-
-  /// The error that occurred, if any.
-  final FrappeException? error;
-
-  /// Whether the operation was successful.
-  bool get isSuccess => error == null;
-
-  /// Whether the operation failed.
-  bool get isError => error != null;
-
   const ApiResult._({
     this.data,
     this.error,
@@ -42,6 +30,18 @@ class ApiResult<T> {
   factory ApiResult.failure(FrappeException error) {
     return ApiResult._(error: error);
   }
+
+  /// The data returned from the API, if successful.
+  final T? data;
+
+  /// The error that occurred, if any.
+  final FrappeException? error;
+
+  /// Whether the operation was successful.
+  bool get isSuccess => error == null;
+
+  /// Whether the operation failed.
+  bool get isError => error != null;
 
   /// Maps the data to a new type.
   ///

@@ -1,7 +1,8 @@
 /// Interface for cookie management.
 ///
-/// Implement this interface to provide custom cookie storage for authentication.
-/// This allows you to use any storage mechanism (secure storage, shared preferences, etc.)
+/// Implement this interface to provide custom cookie storage for
+/// authentication. This allows you to use any storage mechanism
+/// (secure storage, shared preferences, etc.)
 ///
 /// Example implementation:
 /// ```dart
