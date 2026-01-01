@@ -1,9 +1,15 @@
 import 'package:frappe_dart/frappe_dart.dart';
 
 void main() async {
+  // You can use either FrappeV14 or FrappeV15 depending on your Frappe version
   final frappe = FrappeV15(
     baseUrl: 'https://your-frappe-url.com',
   );
+
+  // For Frappe version 14, use:
+  // final frappe = FrappeV14(
+  //   baseUrl: 'https://your-frappe-url.com',
+  // );
 
   try {
     final authResponse = await frappe.login(

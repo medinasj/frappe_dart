@@ -1,3 +1,7 @@
+## Unreleased
+
+- **feat**: implement Frappe version 14 support with FrappeV14 class
+
 ## 0.0.6
 
 - **feat**: implement client get api endpoint
