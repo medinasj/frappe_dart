@@ -107,7 +107,7 @@ You can extend the functionality of frappe_dart to support additional custom API
 ### Extending FrappeV16
 
 ```dart
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 extension FrappeV16Extensions on FrappeV16 {
   Future<Map<String, dynamic>> newApiEndPoint() async {
@@ -115,9 +115,11 @@ extension FrappeV16Extensions on FrappeV16 {
 
     final response = await dio.get<Map<String, dynamic>>(
       url,
-      headers: {
-        if (cookie != null) 'Cookie': cookie,
-      },
+      options: Options(
+        headers: {
+          if (cookie != null) 'Cookie': cookie,
+        },
+      ),
     );
 
     return response.data!;
@@ -128,7 +130,7 @@ extension FrappeV16Extensions on FrappeV16 {
 ### Extending FrappeV15
 
 ```dart
-import 'package:http/http.dart' as http;
+import 'package:dio/dio.dart';
 
 extension FrappeV15Extensions on FrappeV15 {
   Future<Map<String, dynamic>> newApiEndPoint() async {
@@ -136,9 +138,11 @@ extension FrappeV15Extensions on FrappeV15 {
 
     final response = await dio.get<Map<String, dynamic>>(
       url,
-      headers: {
-        if (cookie != null) 'Cookie': cookie,
-      },
+      options: Options(
+        headers: {
+          if (cookie != null) 'Cookie': cookie,
+        },
+      ),
     );
 
     return response.data!;
