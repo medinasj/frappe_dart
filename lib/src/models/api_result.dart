@@ -55,7 +55,7 @@ class ApiResult<T> {
   ApiResult<R> map<R>(R Function(T data) mapper) {
     if (isSuccess && data != null) {
       try {
-        return ApiResult.success(mapper(data as T));
+        return ApiResult.success(mapper(data!));
       } catch (e) {
         return ApiResult.failure(
           FrappeException(message: 'Mapping error: $e'),

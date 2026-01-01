@@ -1502,7 +1502,7 @@ class FrappeV15 implements FrappeApi {
         data: data,
         options: Options(
           headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
+            'Content-Type': 'application/json',
             if (_cookie != null) 'Cookie': _cookie,
           },
         ),
