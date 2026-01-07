@@ -17,7 +17,7 @@ To get started with the `frappe_dart` package, add it to your project's `pubspec
 
 ```yaml
 dependencies:
-  frappe_dart: ^0.0.6
+  frappe_dart: ^0.0.8
 ```
 
 ## Usage
@@ -57,6 +57,298 @@ void main() async {
   } catch (error) {
     print('Error: $error');
   }
+}
+```
+
+## Resource API
+
+The package now includes improved Resource API methods with better error handling using `ApiResult<T>`:
+
+### Get a List of Resources
+
+Using type-safe Filter objects:
+
+```dart
+final result = await frappeClient.getResourceList(
+  'User',
+  options: QueryOptions(
+    filters: [
+      Filter.equal('enabled', 1),
+      Filter.greaterThan('creation', '2025-01-01'),
+    ],
+    fields: ['name', 'full_name', 'email'],
+    orderBy: 'creation desc',
+    limitPageLength: 20,
+    limitStart: 0,
+  ),
+);
+
+if (result.isSuccess) {
+  final users = result.data!['data'] as List;
+  print('Found ${users.length} users');
+} else {
+  print('Error: ${result.error!.message}');
+}
+```
+
+Or using JSON string filters:
+
+```dart
+final result = await frappeClient.getResourceList(
+  'User',
+  options: QueryOptions(
+    filtersJson: '[["enabled", "=", 1]]',
+    fields: ['name', 'full_name', 'email'],
+    orderBy: 'creation desc',
+    limitPageLength: 20,
+  ),
+);
+```
+
+### Get a Single Resource
+
+```dart
+final result = await frappeClient.getResource('User', 'user@example.com');
+
+if (result.isSuccess) {
+  final user = result.data!['data'];
+  print('Full name: ${user['full_name']}');
+}
+```
+
+### Create a Resource
+
+```dart
+final result = await frappeClient.createResource('ToDo', {
+  'description': 'Complete the task',
+  'status': 'Open',
+});
+
+if (result.isSuccess) {
+  final newTodo = result.data!['data'];
+  print('Created: ${newTodo['name']}');
+}
+```
+
+### Update a Resource
+
+```dart
+final result = await frappeClient.updateResource(
+  'ToDo',
+  'TODO-00001',
+  {'status': 'Closed'},
+);
+
+if (result.isSuccess) {
+  print('Updated successfully');
+}
+```
+
+### Delete a Resource
+
+```dart
+final result = await frappeClient.deleteResource('ToDo', 'TODO-00001');
+
+if (result.isSuccess) {
+  print('Deleted successfully');
+}
+```
+
+## Type-Safe Filters
+
+Use the `Filter` class for type-safe, readable filter building:
+
+```dart
+// Using Filter objects (recommended)
+final options = QueryOptions(
+  filters: [
+    Filter.equal('status', 'Open'),
+    Filter.greaterThan('amount', 1000),
+    Filter.like('customer_name', '%Corp%'),
+    Filter.isIn('type', ['Sales', 'Purchase']),
+  ],
+  fields: ['name', 'customer', 'status'],
+  orderBy: 'creation desc',
+  limitPageLength: 20,
+  limitStart: 0,
+);
+```
+
+### Filter Constructors
+
+- `Filter.equal(field, value)` - Equal to (=)
+- `Filter.notEqual(field, value)` - Not equal to (!=)
+- `Filter.greaterThan(field, value)` - Greater than (>)
+- `Filter.greaterThanOrEqual(field, value)` - Greater than or equal (>=)
+- `Filter.lessThan(field, value)` - Less than (<)
+- `Filter.lessThanOrEqual(field, value)` - Less than or equal (<=)
+- `Filter.like(field, value)` - Pattern matching
+- `Filter.notLike(field, value)` - Negative pattern matching
+- `Filter.isIn(field, value)` - In list
+- `Filter.notIn(field, value)` - Not in list
+- `Filter.isNull(field)` - Is null
+- `Filter.isNotNull(field)` - Is not null
+
+### JSON String Filters (alternative)
+
+You can also use JSON string filters if needed:
+
+```dart
+final options = QueryOptions(
+  // Filter conditions as JSON array string
+  filtersJson: '[["status", "=", "Open"], ["creation", ">=", "2025-01-01"]]',
+  
+  // Specific fields to return
+  fields: ['name', 'customer', 'status'],
+  
+  // Sort order
+  orderBy: 'creation desc',
+  
+  // Pagination
+  limitPageLength: 20,
+  limitStart: 0,
+);
+```
+
+## Type-Safe Document Models
+
+Extend `FrappeDoc` to create type-safe document models:
+
+```dart
+class User extends FrappeDoc {
+  const User({
+    required super.name,
+    required super.owner,
+    required super.creation,
+    required super.modified,
+    required super.modifiedBy,
+    required this.email,
+    required this.fullName,
+    required this.enabled,
+  });
+
+  factory User.fromJson(Map<String, dynamic> json) {
+    return User(
+      name: json['name'] as String,
+      owner: json['owner'] as String,
+      creation: DateTime.parse(json['creation'] as String),
+      modified: DateTime.parse(json['modified'] as String),
+      modifiedBy: json['modified_by'] as String,
+      email: json['email'] as String,
+      fullName: json['full_name'] as String,
+      enabled: json['enabled'] == 1,
+    );
+  }
+
+  final String email;
+  final String fullName;
+  final bool enabled;
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'owner': owner,
+      'email': email,
+      'full_name': fullName,
+      'enabled': enabled ? 1 : 0,
+    };
+  }
+}
+```
+
+## Error Handling with ApiResult
+
+The new Resource API methods return `ApiResult<T>` for clean error handling:
+
+```dart
+final result = await frappeClient.getResource('User', 'user@example.com');
+
+if (result.isSuccess) {
+  // Access data
+  final data = result.data!;
+  print(data);
+} else {
+  // Handle error - specific exception types
+  final error = result.error!;
+  
+  if (error is FrappeNotFoundException) {
+    print('User not found');
+  } else if (error is FrappeUnauthorizedException) {
+    print('Please log in');
+  } else if (error is FrappeForbiddenException) {
+    print('Access denied');
+  } else if (error is FrappeServerException) {
+    print('Server error occurred');
+  } else {
+    print('Error: ${error.message}');
+  }
+  
+  print('Status Code: ${error.statusCode}');
+  print('Additional Data: ${error.data}');
+}
+```
+
+### Specific Exception Types
+
+- `FrappeNotFoundException` - Resource not found (404)
+- `FrappeUnauthorizedException` - Authentication required (401)
+- `FrappeForbiddenException` - Access forbidden (403)
+- `FrappeServerException` - Server errors (500+)
+- `FrappeHttpException` - Other HTTP errors
+
+### Result Mapping
+
+Transform API responses easily:
+
+```dart
+final result = await frappeClient.getResource('User', 'user@example.com');
+
+final mappedResult = result.map((data) {
+  final userData = data['data'] as Map<String, dynamic>;
+  return User.fromJson(userData);
+});
+
+if (mappedResult.isSuccess) {
+  final user = mappedResult.data!;
+  print(user.fullName);
+}
+```
+
+## Custom Method Calls
+
+Call custom Frappe server-side methods:
+
+```dart
+// POST request
+final result = await frappeClient.callFrappeMethod(
+  'myapp.api.update_status',
+  data: {
+    'docname': 'TODO-00001',
+    'status': 'Completed',
+  },
+);
+
+// GET request
+final result = await frappeClient.callFrappeMethodGet(
+  'myapp.api.get_statistics',
+  queryParams: {'date': '2025-12-14'},
+);
+```
+
+## Setting Field Values
+
+Set individual field values on documents:
+
+```dart
+final result = await frappeClient.setFieldValue(
+  'User',
+  'user@example.com',
+  'bio',
+  'Software developer',
+);
+
+if (result.isSuccess) {
+  print('Field updated successfully');
 }
 ```
 
