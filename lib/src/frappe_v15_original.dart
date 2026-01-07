@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:frappe_dart/frappe_dart.dart';
-import 'package:frappe_dart/src/frappe_base.dart';
+import 'package:frappe_dart/src/frappe_api.dart';
 import 'package:frappe_dart/src/models/report_view_request.dart';
 import 'package:frappe_dart/src/models/report_view_response.dart';
 import 'package:frappe_dart/src/models/error_response.dart';
@@ -11,16 +11,36 @@ import 'package:frappe_dart/src/models/savedocs_response/savedocs_response.dart'
 import 'package:frappe_dart/src/models/send_email_response.dart';
 
 /// A class that implements the Frappe API for version 15.
-///
-/// This class extends [FrappeBase] and provides version-specific
-/// implementations for Frappe v15 APIs.
-class FrappeV15 extends FrappeBase {
+class FrappeV15 implements FrappeApi {
   /// Creates a new instance of [FrappeV15].
   FrappeV15({
-    required super.baseUrl,
-    super.dio,
-    super.cookie,
-  });
+    required String baseUrl,
+    Dio? dio,
+    String? cookie,
+  })  : _baseUrl = baseUrl,
+        _cookie = cookie,
+        _dio = dio ?? Dio();
+
+  String _baseUrl;
+  String? _cookie;
+  final Dio _dio;
+
+  /// The base URL of the Frappe instance.
+  String get baseUrl => _baseUrl;
+
+  /// The cookie used for authentication.
+  String? get cookie => _cookie;
+
+  set baseUrl(String newBaseUrl) {
+    _baseUrl = newBaseUrl;
+  }
+
+  set cookie(String? newCookie) {
+    _cookie = newCookie;
+  }
+
+  ///getter of dio
+  Dio get dio => _dio;
 
   @override
   Future<LoginResponse> login(LoginRequest loginRequest) async {
